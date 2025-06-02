@@ -1,9 +1,13 @@
 package com.example.productsmobileapplication.data
 
-import com.example.productsmobileapplication.model.Product
+import com.example.productsmobileapplication.model.ProductsResponse
 import retrofit2.http.GET
+import retrofit2.http.Query
 
 interface ApiService {
     @GET("products")
-    suspend fun getProducts(): ProductsResponse
+    suspend fun getProducts(
+        @Query("skip") skip: Int,
+        @Query("limit") limit: Int
+    ): ProductsResponse
 }

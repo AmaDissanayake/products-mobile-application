@@ -5,11 +5,11 @@ import com.example.productsmobileapplication.model.Product
 class ProductRepository {
     private val api = RetrofitInstance.api
 
-    suspend fun getAllProducts(): List<Product> {
+    suspend fun getProducts(skip: Int, limit: Int): List<Product> {
         return try {
-            api.getProducts().products
+            api.getProducts(skip, limit).products
         } catch (e: Exception) {
-            emptyList() // Return empty list on error
+            emptyList()
         }
     }
 }

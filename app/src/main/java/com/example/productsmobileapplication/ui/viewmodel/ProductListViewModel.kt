@@ -1,4 +1,4 @@
-package com.example.productsmobileapplication.ui.viewmodel
+package com.example.productsmobileapplication.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -16,19 +16,40 @@ class ProductListViewModel(
     private val _products = MutableStateFlow<List<Product>>(emptyList())
     val products: StateFlow<List<Product>> = _products.asStateFlow()
 
-    private val _isLoading = MutableStateFlow(true)
-    val isLoading = _isLoading.asStateFlow()
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+
+    private val _error = MutableStateFlow<String?>(null)
+    val error: StateFlow<String?> = _error.asStateFlow()
+
+    private var currentPage = 0
+    private val pageSize = 10
+    var allItemsLoaded = false
+        private set
 
     init {
         loadProducts()
     }
 
-    private fun loadProducts() {
+    fun loadProducts() {
+        if (_isLoading.value || allItemsLoaded) return
+
+        _isLoading.value = true
         viewModelScope.launch {
             try {
-                _products.value = repository.getAllProducts()
+                val newProducts = repository.getProducts(
+                    skip = currentPage * pageSize,
+                    limit = pageSize
+                )
+
+                _products.value = _products.value + newProducts
+                currentPage++
+
+                if (newProducts.size < pageSize) {
+                    allItemsLoaded = true
+                }
             } catch (e: Exception) {
-                // Handle error (we'll add error state later)
+                _error.value = "Failed to load products: ${e.message}"
             } finally {
                 _isLoading.value = false
             }

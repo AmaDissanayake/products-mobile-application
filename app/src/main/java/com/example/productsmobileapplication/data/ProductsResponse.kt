@@ -1,6 +1,4 @@
-package com.example.productsmobileapplication.data
-
-import com.example.productsmobileapplication.model.Product
+package com.example.productsmobileapplication.model
 
 data class ProductsResponse(
     val products: List<Product>,
