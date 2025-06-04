@@ -8,13 +8,14 @@ import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -69,11 +70,11 @@ class ProductDetailViewModelTest {
 
             // When
             viewModel.loadProduct(1)
-            testDispatcher.scheduler.advanceUntilIdle()
+            advanceUntilIdle()
 
             // Then
             assertEquals(mockProduct, viewModel.product.value)
-            assertTrue(viewModel.isLoading.value == false)
+            assertFalse(viewModel.isLoading.value)
             assertNull(viewModel.error.value)
         }
     }
@@ -86,11 +87,11 @@ class ProductDetailViewModelTest {
 
             // When
             viewModel.loadProduct(1)
-            testDispatcher.scheduler.advanceUntilIdle()
+            advanceUntilIdle()
 
             // Then
             assertNull(viewModel.product.value)
-            assertTrue(viewModel.isLoading.value == false)
+            assertFalse(viewModel.isLoading.value)
             assertEquals("Product not found", viewModel.error.value)
         }
     }
@@ -104,12 +105,12 @@ class ProductDetailViewModelTest {
 
             // When
             viewModel.loadProduct(1)
-            testDispatcher.scheduler.advanceUntilIdle()
+            advanceUntilIdle()
 
             // Then
             assertNull(viewModel.product.value)
-            assertTrue(viewModel.isLoading.value == false)
-            assertEquals(errorMsg, viewModel.error.value)
+            assertFalse(viewModel.isLoading.value)
+            assertEquals("Failed to load product: $errorMsg", viewModel.error.value)
         }
     }
 }
