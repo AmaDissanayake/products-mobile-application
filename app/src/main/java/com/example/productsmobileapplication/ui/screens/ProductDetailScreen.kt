@@ -2,16 +2,42 @@ package com.example.productsmobileapplication.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -19,7 +45,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -54,7 +79,7 @@ fun ProductDetailScreen(navController: NavController, productId: Int?) {
                         "Product Information",
                         style = MaterialTheme.typography.titleLarge.copy(
                             fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold // Made bold
+                            fontWeight = FontWeight.Bold
                         )
                     )
                 },
@@ -90,31 +115,58 @@ fun ProductDetailScreen(navController: NavController, productId: Int?) {
 
 @Composable
 fun ProductDetailContent(product: Product) {
+    // State to track selected image index
+    var selectedImageIndex by remember { mutableIntStateOf(0) }
+
+    // Get first image URL safely
+    val firstImageUrl = product.images.firstOrNull() ?: product.thumbnail
+    val mainImageUrl = if (product.images.isNotEmpty()) {
+        product.images[selectedImageIndex]
+    } else {
+        firstImageUrl
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally // Center all content
+            .padding(16.dp)
     ) {
-        // Product image with border based on availability
+        // Main product image with availability border
         ProductMainImage(
-            imageUrl = product.images.firstOrNull() ?: product.thumbnail,
+            imageUrl = mainImageUrl,
             availabilityStatus = product.availabilityStatus ?: "In Stock"
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Product title - smaller font, lighter purple
+        // Image Gallery without title
+        if (product.images.size > 1) {
+            LazyRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                itemsIndexed(product.images) { index, imageUrl ->
+                    ThumbnailImage(
+                        imageUrl = imageUrl,
+                        isSelected = index == selectedImageIndex,
+                        onClick = { selectedImageIndex = index }
+                    )
+                }
+            }
+        }
+
+        // Product title
         Text(
             text = product.title,
             style = MaterialTheme.typography.headlineMedium.copy(
-                fontSize = 24.sp, // Smaller than before
-                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f), // Lighter purple
+                fontSize = 22.sp,
                 fontWeight = FontWeight.Bold
             ),
-            textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth()
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -125,31 +177,33 @@ fun ProductDetailContent(product: Product) {
             style = MaterialTheme.typography.headlineSmall.copy(
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Bold
-            ),
-            textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth()
+            )
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Description - centered with more padding
+        // Description
         Text(
             text = product.description,
             style = MaterialTheme.typography.bodyLarge,
-            textAlign = TextAlign.Center, // Center text
-            modifier = Modifier
-                .padding(horizontal = 24.dp) // More space on sides
-                .padding(bottom = 16.dp)
+            modifier = Modifier.padding(bottom = 16.dp)
         )
 
-        // Additional details - centered
-        ProductDetailItem(label = "Brand", value = product.brand ?: "N/A")
+        // Additional details
+        ProductDetailItem(label = "Brand", value = product.brand ?: "Not specified")
         ProductDetailItem(label = "Category", value = product.category)
 
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Tags - centered
-        ProductTags(tags = product.tags ?: emptyList())
+        // Only show tags if available
+        if (!product.tags.isNullOrEmpty()) {
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "Tags",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            ProductTags(tags = product.tags)
+        }
     }
 }
 
@@ -186,15 +240,42 @@ fun ProductMainImage(imageUrl: String, availabilityStatus: String) {
 }
 
 @Composable
+fun ThumbnailImage(imageUrl: String, isSelected: Boolean, onClick: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .size(80.dp)
+            .clip(RoundedCornerShape(8.dp))
+            .border(
+                width = 2.dp,
+                color = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent,
+                shape = RoundedCornerShape(8.dp)
+            )
+            .clickable(onClick = onClick)
+    ) {
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(imageUrl)
+                .crossfade(true)
+                .build(),
+            contentDescription = "Product thumbnail",
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .fillMaxSize()
+                .clip(RoundedCornerShape(8.dp))
+        )
+    }
+}
+
+@Composable
 fun ProductTags(tags: List<String>) {
     if (tags.isNotEmpty()) {
         Column(
             modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally // Center tags
+            horizontalAlignment = Alignment.Start
         ) {
             LazyRow(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center // Center tags horizontally
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(tags) { tag ->
                     Box(
@@ -218,7 +299,6 @@ fun ProductTags(tags: List<String>) {
                             )
                         )
                     }
-                    Spacer(modifier = Modifier.width(8.dp))
                 }
             }
         }
@@ -227,24 +307,23 @@ fun ProductTags(tags: List<String>) {
 
 @Composable
 fun ProductDetailItem(label: String, value: String) {
-    Column(
+    Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp),
-        horizontalAlignment = Alignment.CenterHorizontally // Center content
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = label,
+            text = "$label:",
             style = MaterialTheme.typography.bodyLarge.copy(
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary
-            )
+            ),
+            modifier = Modifier.width(100.dp)
         )
         Text(
             text = value,
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.padding(top = 4.dp),
-            textAlign = TextAlign.Center
+            style = MaterialTheme.typography.bodyLarge
         )
     }
 }

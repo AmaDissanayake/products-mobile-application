@@ -5,10 +5,12 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -88,15 +90,12 @@ fun ProductListScreen(navController: NavController) {
                 modifier = Modifier.fillMaxSize()
             ) {
                 items(products) { product ->
-                    // Added horizontal padding for each card
-                    Box(modifier = Modifier.padding(horizontal = 23.dp)) {
-                        ProductCard(
-                            product = product,
-                            onClick = {
-                                navController.navigate("productDetail/${product.id}")
-                            }
-                        )
-                    }
+                    ProductCard(
+                        product = product,
+                        onClick = {
+                            navController.navigate("productDetail/${product.id}")
+                        }
+                    )
                 }
 
                 item {
@@ -131,9 +130,10 @@ fun ProductCard(product: Product, onClick: () -> Unit) {
         onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp) // Changed to vertical padding only
+            .padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
         Row(modifier = Modifier.padding(16.dp)) {
+            // Product image
             if (product.thumbnail.isNotEmpty()) {
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
@@ -142,31 +142,53 @@ fun ProductCard(product: Product, onClick: () -> Unit) {
                         .build(),
                     contentDescription = "Product thumbnail",
                     contentScale = ContentScale.Crop,
-                    modifier = Modifier.size(80.dp)
+                    modifier = Modifier
+                        .size(100.dp)
+                        .clip(RoundedCornerShape(8.dp))
                 )
             } else {
                 Image(
                     painter = painterResource(R.drawable.placeholder_image),
                     contentDescription = "Placeholder",
-                    modifier = Modifier.size(80.dp)
+                    modifier = Modifier
+                        .size(100.dp)
+                        .clip(RoundedCornerShape(8.dp))
                 )
             }
-
             Spacer(modifier = Modifier.width(16.dp))
-            Column {
+
+            // Product details
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .align(Alignment.CenterVertically)
+            ) {
                 Text(
                     text = product.title,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.fillMaxWidth()
                 )
+
                 Spacer(modifier = Modifier.height(4.dp))
+
+                Text(
+                    text = "$${product.price}",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Bold
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
                 Text(
                     text = product.description,
                     style = MaterialTheme.typography.bodyMedium,
                     maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
         }

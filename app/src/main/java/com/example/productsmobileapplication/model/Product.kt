@@ -12,5 +12,5 @@ data class Product(
     @SerializedName("brand") val brand: String?,
     @SerializedName("category") val category: String,
     @SerializedName("tags") val tags: List<String>? = emptyList(),
-    @SerializedName("availabilityStatus") val availabilityStatus: String? = "In Stock" // Added field
+    @SerializedName("availabilityStatus") val availabilityStatus: String? = "In Stock"
 )
