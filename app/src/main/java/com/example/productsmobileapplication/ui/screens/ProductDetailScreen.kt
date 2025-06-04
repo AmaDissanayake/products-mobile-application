@@ -52,7 +52,10 @@ fun ProductDetailScreen(navController: NavController, productId: Int?) {
                 title = {
                     Text(
                         "Product Information",
-                        style = MaterialTheme.typography.titleLarge.copy(fontSize = 18.sp)
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold // Made bold
+                        )
                     )
                 },
                 navigationIcon = {
@@ -91,7 +94,8 @@ fun ProductDetailContent(product: Product) {
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(16.dp)
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally // Center all content
     ) {
         // Product image with border based on availability
         ProductMainImage(
@@ -101,11 +105,14 @@ fun ProductDetailContent(product: Product) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Product title
+        // Product title - smaller font, lighter purple
         Text(
             text = product.title,
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Bold,
+            style = MaterialTheme.typography.headlineMedium.copy(
+                fontSize = 24.sp, // Smaller than before
+                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f), // Lighter purple
+                fontWeight = FontWeight.Bold
+            ),
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth()
         )
@@ -125,20 +132,23 @@ fun ProductDetailContent(product: Product) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Description
+        // Description - centered with more padding
         Text(
             text = product.description,
             style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.padding(bottom = 16.dp)
+            textAlign = TextAlign.Center, // Center text
+            modifier = Modifier
+                .padding(horizontal = 24.dp) // More space on sides
+                .padding(bottom = 16.dp)
         )
 
-        // Additional details
+        // Additional details - centered
         ProductDetailItem(label = "Brand", value = product.brand ?: "N/A")
         ProductDetailItem(label = "Category", value = product.category)
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Tags
+        // Tags - centered
         ProductTags(tags = product.tags ?: emptyList())
     }
 }
@@ -178,31 +188,37 @@ fun ProductMainImage(imageUrl: String, availabilityStatus: String) {
 @Composable
 fun ProductTags(tags: List<String>) {
     if (tags.isNotEmpty()) {
-        LazyRow(
+        Column(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalAlignment = Alignment.CenterHorizontally // Center tags
         ) {
-            items(tags) { tag ->
-                Box(
-                    modifier = Modifier
-                        .background(
-                            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
-                            shape = RoundedCornerShape(16.dp)
+            LazyRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center // Center tags horizontally
+            ) {
+                items(tags) { tag ->
+                    Box(
+                        modifier = Modifier
+                            .background(
+                                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+                                shape = RoundedCornerShape(16.dp)
+                            )
+                            .border(
+                                width = 1.dp,
+                                color = MaterialTheme.colorScheme.primary,
+                                shape = RoundedCornerShape(16.dp)
+                            )
+                            .padding(horizontal = 12.dp, vertical = 6.dp)
+                    ) {
+                        Text(
+                            text = tag,
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                color = MaterialTheme.colorScheme.primary,
+                                fontWeight = FontWeight.Bold
+                            )
                         )
-                        .border(
-                            width = 1.dp,
-                            color = MaterialTheme.colorScheme.primary,
-                            shape = RoundedCornerShape(16.dp)
-                        )
-                        .padding(horizontal = 12.dp, vertical = 6.dp)
-                ) {
-                    Text(
-                        text = tag,
-                        style = MaterialTheme.typography.bodyMedium.copy(
-                            color = MaterialTheme.colorScheme.primary,
-                            fontWeight = FontWeight.Bold
-                        )
-                    )
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
                 }
             }
         }
@@ -211,22 +227,24 @@ fun ProductTags(tags: List<String>) {
 
 @Composable
 fun ProductDetailItem(label: String, value: String) {
-    Row(
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp)
+            .padding(vertical = 8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally // Center content
     ) {
         Text(
-            text = "$label:",
-            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
-            modifier = Modifier.width(100.dp)
+            text = label,
+            style = MaterialTheme.typography.bodyLarge.copy(
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
+            )
         )
         Text(
             text = value,
             style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.weight(1f),
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis
+            modifier = Modifier.padding(top = 4.dp),
+            textAlign = TextAlign.Center
         )
     }
 }

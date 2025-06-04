@@ -50,13 +50,14 @@ fun ProductListScreen(navController: NavController) {
 
     Scaffold(
         topBar = {
-            // Centered and bold "Shop with Us" title
+            // Centered and bold "Everyday Shopper" title
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = "Shop with Us",
+                        text = "Everyday Shopper",
                         fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
             )
@@ -87,12 +88,15 @@ fun ProductListScreen(navController: NavController) {
                 modifier = Modifier.fillMaxSize()
             ) {
                 items(products) { product ->
-                    ProductCard(
-                        product = product,
-                        onClick = {
-                            navController.navigate("productDetail/${product.id}")
-                        }
-                    )
+                    // Added horizontal padding for each card
+                    Box(modifier = Modifier.padding(horizontal = 23.dp)) {
+                        ProductCard(
+                            product = product,
+                            onClick = {
+                                navController.navigate("productDetail/${product.id}")
+                            }
+                        )
+                    }
                 }
 
                 item {
@@ -127,7 +131,7 @@ fun ProductCard(product: Product, onClick: () -> Unit) {
         onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp)
+            .padding(vertical = 8.dp) // Changed to vertical padding only
     ) {
         Row(modifier = Modifier.padding(16.dp)) {
             if (product.thumbnail.isNotEmpty()) {
