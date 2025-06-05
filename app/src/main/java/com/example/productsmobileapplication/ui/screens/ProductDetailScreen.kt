@@ -115,10 +115,9 @@ fun ProductDetailScreen(navController: NavController, productId: Int?) {
 
 @Composable
 fun ProductDetailContent(product: Product) {
-    // State to track selected image index
+
     var selectedImageIndex by remember { mutableIntStateOf(0) }
 
-    // Get first image URL safely
     val firstImageUrl = product.images.firstOrNull() ?: product.thumbnail
     val mainImageUrl = if (product.images.isNotEmpty()) {
         product.images[selectedImageIndex]

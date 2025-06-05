@@ -10,7 +10,6 @@ import androidx.navigation.compose.rememberNavController
 import com.example.productsmobileapplication.ui.screens.ProductDetailScreen
 import com.example.productsmobileapplication.ui.screens.ProductListScreen
 import com.example.productsmobileapplication.ui.theme.ProductsMobileApplicationTheme
-import com.example.productsmobileapplication.viewmodels.ProductDetailViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -1,7 +1,6 @@
 package com.example.productsmobileapplication.di
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import com.example.productsmobileapplication.viewmodels.ProductDetailViewModel
 import com.example.productsmobileapplication.viewmodels.ProductListViewModel
 import org.junit.Assert.assertTrue

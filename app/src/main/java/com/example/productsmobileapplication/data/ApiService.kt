@@ -13,7 +13,7 @@ interface ApiService {
         @Query("limit") limit: Int
     ): ProductsResponse
 
-    // Add endpoint for single product
+    // Endpoint for single product
     @GET("products/{id}")
     suspend fun getProductById(@Path("id") id: Int): Product
 }

@@ -35,11 +35,10 @@ class SplashActivity : ComponentActivity() {
         // Check if system is in dark mode
         val isDarkMode = (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
 
-        // Set status bar properties based on theme
         if (isDarkMode) {
             window.statusBarColor = android.graphics.Color.BLACK
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                window.decorView.systemUiVisibility = 0 // Clear light status bar flag
+                window.decorView.systemUiVisibility = 0
             }
         } else {
             window.statusBarColor = android.graphics.Color.WHITE
@@ -49,10 +48,8 @@ class SplashActivity : ComponentActivity() {
             }
         }
 
-        // Enable edge-to-edge
         enableEdgeToEdge()
 
-        // Additional status bar handling for newer Android versions
         WindowCompat.setDecorFitsSystemWindows(window, false)
         WindowCompat.getInsetsController(window, window.decorView).apply {
             isAppearanceLightStatusBars = !isDarkMode

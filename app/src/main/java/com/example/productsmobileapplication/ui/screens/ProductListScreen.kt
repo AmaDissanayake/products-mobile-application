@@ -52,7 +52,6 @@ fun ProductListScreen(navController: NavController) {
 
     Scaffold(
         topBar = {
-            // Centered and bold "Everyday Shopper" title
             CenterAlignedTopAppBar(
                 title = {
                     Text(
